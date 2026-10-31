@@ -125,9 +125,9 @@
 <main>
   <div class="wrap gp-head">
     <div class="eyebrow">Closed-source reference</div>
-    <h1>GPT 也画了这一组 <span class="thin">30 / 51</span></h1>
+    <h1>GPT 也画了这一组 <span class="thin" id="sHead">30 / 51</span></h1>
     <p>
-      同一套 51 条 SFW 提示词，交给 ChatGPT 的图像生成跑了一遍，拿到 30 张。
+      同一套 51 条 SFW 提示词，交给 ChatGPT 的图像生成跑了一遍，拿到 <span id="sIntroN">30</span> 张。
       这里按提示词编号排成宫格：有图的放图，没画的留一块斜纹空格，缺哪条一眼能看出来。
       GPT 的图不在测评口径内——没有固定 seed、没有记录步数与显存，画幅也被拼图统一裁过，
       只作「闭源模型长什么样」的参照，不与 13 个开源配置并列排名。
@@ -153,8 +153,8 @@
     <div class="gp-grid" id="gpGrid"></div>
 
     <section class="gp-miss">
-      <h2>没画的 21 条</h2>
-      <p class="lead">这 21 条不在本轮范围内，宫格上留白处理。提示词原文在 <a href="models.html" style="border-bottom:1px solid var(--line-2)">模型页</a>与 <code class="mono" style="font-size:11.5px">kit/02_prompts/prompts_sfw.json</code> 里，哪天要补齐按编号对得上。</p>
+      <h2>没画的 <span id="sMissT">21</span> 条</h2>
+      <p class="lead">这 <span id="sMissT2">21</span> 条不在本轮范围内，宫格上留白处理。提示词原文在 <a href="models.html" style="border-bottom:1px solid var(--line-2)">模型页</a>与 <code class="mono" style="font-size:11.5px">kit/02_prompts/prompts_sfw.json</code> 里，哪天要补齐按编号对得上。</p>
       <ol id="gpMiss"></ol>
     </section>
 
@@ -210,6 +210,14 @@
   document.getElementById("sTotal").textContent = total;
   document.getElementById("sCats").textContent = new Set(REF.shots.map(function (s) { return s.cat; })).size;
   document.getElementById("sSheet").textContent = new Set(REF.shots.map(function (s) { return s.sheet; })).size;
+  var head = document.getElementById("sHead"); if (head) head.textContent = have + " / " + total;
+  var inN = document.getElementById("sIntroN"); if (inN) inN.textContent = have;
+  ["sMissT", "sMissT2"].forEach(function (id) {
+    var e = document.getElementById(id); if (e) e.textContent = miss;
+  });
+  if (!miss) {
+    var ms0 = document.querySelector(".gp-miss"); if (ms0) ms0.style.display = "none";
+  }
 
   if (!prompts.length) {
     ["sHave", "sMiss", "sTotal", "sCats", "sSheet"].forEach(function (id) {
