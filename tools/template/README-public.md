@@ -7,6 +7,8 @@
 
 ![图库预览](assets/cover-public.jpg)
 
+> **在线浏览：https://greenwoodpro.github.io/t2i-benchmark/**
+>
 > 数据快照 **2026-10-27**。本仓库是 **SFW 公开版**：只有非成人向结果。
 > 原始测评另有 16 条成人向提示词与 384 张图，只在私有版本中，不在此仓库。
 > 模型权重不随仓库分发。
@@ -110,7 +112,7 @@ git push -u origin main
 ```
 
 仓库 **Settings → Pages → Source: Deploy from a branch → `main` / `/ (root)`**，
-一两分钟后访问 `https://<账号>.github.io/t2i-benchmark/`。仓库已带 `.nojekyll`。
+一两分钟后访问 https://greenwoodpro.github.io/t2i-benchmark/。仓库已带 `.nojekyll`。
 
 - 仓库约 48 MB（主要是 723 张缩略图），在 GitHub 建议的 1 GB 以内。
 - 原始 PNG 全量约 1.5 GB，**不入库**；需要原图请从跑图产物另存，或用 release 附件。
