@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<script>document.documentElement.classList.add("js")</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图库 · T2I Benchmark 2026</title>
+<meta name="description" content="按显卡、模型、类别、关键词筛选实测图，点击查看大图、完整参数与原始提示词。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="图库 · T2I Benchmark 2026">
+<meta property="og:description" content="13 个模型配置 × 51 条提示词，逐图可查参数。">
+<!--HEAD-EXTRA-->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23191612'/%3E%3Ctext x='16' y='21' font-family='monospace' font-size='11' font-weight='700' fill='%23f7f5f0' text-anchor='middle'%3ET2I%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body data-variant="__VARIANT__">
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <span class="mark">T2I</span>
+      <span>开源文生图测评</span>
+      <span class="sub">Benchmark 2026</span>
+    </a>
+    <nav class="nav">
+      <a href="index.html">总览</a>
+      <a href="gallery.html" aria-current="page">图库</a>
+      <a href="report.html">报告</a>
+      <a href="models.html">模型</a>
+      <a href="gpt.html">GPT 对照</a>
+      <a href="disclaimer.html">说明</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="page-head">
+      <div class="eyebrow">Gallery</div>
+      <h1 id="galTitle">每张图，都能查到底</h1>
+      <p id="galIntro">
+        同一行提示词下，不同模型各自跑一次。点开任意一张看完整参数：分辨率、步数、CFG、采样器、
+        耗时、峰值显存，以及当时实际喂进去的提示词。
+      </p>
+    </div>
+  </div>
+
+  <div class="gal-toolbar" id="galFilters">
+    <div class="wrap">
+      <div class="row1">
+        <div class="seg" id="gpuSeg">
+          <button data-g="all" class="on">全部卡</button>
+          <button data-g="T4">T4 16G</button>
+          <button data-g="A10">A10 24G</button>
+        </div>
+        <label class="search" style="flex:1 1 240px">
+          <span class="ico">⌕</span>
+          <input id="galSearch" type="search" placeholder="搜模型、标题、提示词 ID…" autocomplete="off">
+        </label>
+        <span class="mono" style="font-size:10px;color:var(--ink-3)">点击图片看大图 · ← → 翻页</span>
+      </div>
+      <div class="chips nowrap" id="modelChips"></div>
+      <div class="chiprow">
+        <div class="chips" id="catChips"></div>
+        <button id="moreChips" class="more">更多类别</button>
+      </div>
+      <div class="nsfw-bar" id="nsfwBar">
+        <span><b>成人向内容。</b>本仓库含 18+ 评测样本，仅用于观察模型护栏行为；所有条目限定成年人。未满 18 岁请勿查看。</span>
+        <button id="nsfwToggle" type="button">我已成年，显示成人向</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="gal-count">
+      <span id="galCount">载入中…</span>
+      <span>SFW ONLY · 18+ GATED</span>
+    </div>
+    <div class="gal" id="gal"></div>
+    <p style="margin:26px 0 0;font-size:12px;color:var(--ink-3)">
+      图片为 720px 长边缩略图，用于对比构图与细节；原始 PNG 分辨率见每张图的参数面板。
+    </p>
+  </div>
+</main>
+
+<div class="lb-box" id="lightbox">
+  <div class="stage"><img alt=""></div>
+  <aside class="side"></aside>
+  <button class="close" aria-label="关闭">✕</button>
+  <button class="nav prev" aria-label="上一张">‹</button>
+  <button class="nav next" aria-label="下一张">›</button>
+</div>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-bottom" style="border-top:0;padding-top:0">
+      <span>T2I BENCHMARK · 2026-10-27</span>
+      <span>代码 MIT · 数据与图片 CC BY-NC 4.0 · 不含模型权重</span>
+    </div>
+  </div>
+</footer>
+
+<script src="data/site-data.js"></script>
+<script src="data/gallery.js"></script>
+<script src="assets/site.js"></script>
+<script>
+  (function () {
+    var d = window.BENCH;
+    if (!d) return;
+    var t = document.getElementById("galTitle");
+    var p = document.getElementById("galIntro");
+    if (d.variant === "private") {
+      if (t) t.textContent = d.counts.images + " 张，含成人向分档";
+      if (p) p.textContent = "同一行提示词下，不同模型各自跑一次。这里收录了全部 " + d.counts.images +
+        " 张图，其中 " + d.counts.nsfw + " 张为成人向（默认隐藏，需确认后查看）。点开任意一张看完整参数与当时的提示词。";
+    } else if (t) {
+      t.textContent = d.counts.images + " 张 SFW 实测图";
+    }
+  })();
+</script>
+</body>
+</html>

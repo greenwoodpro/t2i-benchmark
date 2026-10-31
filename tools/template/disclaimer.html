@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<script>document.documentElement.classList.add("js")</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>范围与许可 · T2I Benchmark 2026</title>
+<meta name="description" content="测评范围、内容边界、数据口径限制、许可与引用方式。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23191612'/%3E%3Ctext x='16' y='21' font-family='monospace' font-size='11' font-weight='700' fill='%23f7f5f0' text-anchor='middle'%3ET2I%3C/text%3E%3C/svg%3E">
+<!--HEAD-EXTRA-->
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .doc h2 { font-size: 18px; letter-spacing: -.015em; margin: 34px 0 10px; }
+  .doc p, .doc li { max-width: 74ch; }
+  .doc ul { padding-left: 20px; }
+</style>
+</head>
+<body data-variant="__VARIANT__">
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <span class="mark">T2I</span>
+      <span>开源文生图测评</span>
+      <span class="sub">Benchmark 2026</span>
+    </a>
+    <nav class="nav">
+      <a href="index.html">总览</a>
+      <a href="gallery.html">图库</a>
+      <a href="report.html">报告</a>
+      <a href="models.html">模型</a>
+      <a href="gpt.html">GPT 对照</a>
+      <a href="disclaimer.html" aria-current="page">说明</a>
+    </nav>
+  </div>
+</header>
+
+<main class="doc">
+  <div class="wrap">
+    <div class="page-head">
+      <div class="eyebrow">07 — Scope &amp; License</div>
+      <h1>这份记录能用来做什么</h1>
+      <p>
+        这是一份开源文生图模型的<b>技术评测记录</b>，不是榜单、不是采购建议。
+        下面写清楚它的范围、边界与已知误差，方便你判断哪些结论可以引用、哪些只能当参考。
+      </p>
+    </div>
+
+    <div class="prose" style="max-width:none">
+      <h2>1 · 用途限定</h2>
+      <p>
+        仅用于技术研究、模型能力对比与工程选型参考，不构成任何商业承诺或性能担保。
+        基于本记录做出的采购、部署或内容生产决策，风险自负。
+      </p>
+
+      <h2 id="scope">2 · 内容范围</h2>
+      <p id="scopeText">
+        本站<b>只包含 SFW（非成人向）结果</b>。
+      </p>
+      <p>
+        原始测评另跑了 16 条成人向提示词、384 张图，用于观察内容护栏与拒绝行为。
+        这些内容只存在于<b>私有版本</b>（同一套源码的另一个构建），公开版本不包含，也不提供下载。
+      </p>
+      <p>
+        所有 SFW 提示词均为合成撰写，不含真实个人信息，不针对任何真实人物。
+        若你认为某条内容侵犯了你的权益，请通过仓库 Issue 联系。
+      </p>
+
+      <h2>3 · 模型与商标</h2>
+      <p>
+        被测模型（FLUX、Qwen-Image、Z-Image、Krea、MOSS、SDXL 系列等）的版权与许可归各自作者所有。
+        本仓库<b>不包含、不分发任何模型权重</b>，只记录调用方式、参数与结果。
+        文中出现的模型名称仅用于标识，不代表其所属公司的背书。
+      </p>
+      <p>
+        <b>商用前请逐模型核对许可。</b>FLUX.1 Krea、Qwen-Image 2.1 属非商业或研究许可；
+        Animagine 为 CreativeML Open RAIL++-M；其余模型请查模型页。本页不构成法律意见。
+      </p>
+
+      <h2>4 · 数据准确性</h2>
+      <p>数据由自动化流程采集（ComfyUI HTTP API + 定时显存采样），已尽力保证一致性，但不保证无误。</p>
+      <ul>
+        <li><b>耗时为单机墙钟时间</b>，含文本编码与 VAE 解码，受驱动、系统负载、GPU 温度影响，换环境结果会不同。</li>
+        <li><b>显存为 <span class="mono">nvidia-smi</span> 采样峰值</b>（每 0.5 秒），非理论值。</li>
+        <li><b>跨批次混合会失真</b>：10-22 之前用旧启动参数，之后换定版参数。本站默认用「该模型最近一个批次」的中位，并同时列出全量中位。</li>
+        <li><b>样本量不均</b>：T4 六个模型 51–71 张，A10 新模型 51 张；部分批次只有 20–40 张。</li>
+        <li><b>画幅不同不可直接比构图</b>：六种宽高比按提示词需要分配，同一模型跨题的分辨率不同。</li>
+        <li><b>人工打分未完成</b>：本站只提供速度、显存与结构性观察；提示词遵循、美学、文字正确率需要你自己看图或用打分表。</li>
+        <li>一切以 <span class="mono">records.jsonl</span> 原始记录为准。</li>
+      </ul>
+
+      <h2>5 · 生成内容</h2>
+      <p>
+        图片由 AI 生成，可能存在事实错误、结构崩坏、偏见或不适内容，不代表本项目立场。
+        公开引用单张图时，请同时标注模型名、seed 与提示词 ID，避免脱离上下文。
+      </p>
+
+      <h2>6 · 许可</h2>
+      <div class="table-wrap" style="margin-top:14px">
+        <table class="spec">
+          <thead><tr><th>对象</th><th>许可</th></tr></thead>
+          <tbody>
+            <tr><td>代码（HTML / CSS / JS / Python 脚本）</td><td class="mono">MIT</td></tr>
+            <tr><td>评测数据与生成图片（data/、thumbs/）</td><td class="mono">CC BY-NC 4.0</td></tr>
+            <tr><td>模型权重与商标</td><td>归各自作者，本仓库不包含</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:14px">
+        CC BY-NC 4.0 允许署名后非商业使用；商业使用请先确认模型许可，并与本仓库联系。
+      </p>
+
+      <h2>7 · 引用</h2>
+      <p>
+        引用本记录时请注明：项目名、数据快照日期（2026-10-27）与仓库地址。
+        例：<span class="mono">T2I Benchmark 2026, 13 open-source T2I configs on T4/A10, snapshot 2026-10-27.</span>
+      </p>
+
+      <h2>8 · 纠错</h2>
+      <p>
+        发现数字对不上、参数写错或图片与记录不符，欢迎开 Issue。
+        每条记录都能用 <span class="mono">records.jsonl</span> 里的
+        <span class="mono">timestamp</span> + <span class="mono">comfy_prompt_id</span> 回溯到具体一次运行。
+      </p>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-bottom">
+      <span>T2I BENCHMARK · 2026-10-27</span>
+      <span>代码 MIT · 数据与图片 CC BY-NC 4.0 · 不含模型权重</span>
+    </div>
+  </div>
+</footer>
+
+<script src="data/site-data.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

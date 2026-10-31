@@ -1,0 +1,230 @@
+{
+  "_meta": {
+    "generated": "2026-10-16",
+    "verified_via": [
+      "https://huggingface.co/api/models/<repo>?blobs=true (文件名/大小/是否 gated)",
+      "https://civitai.com/api/v1/models/<id> (版本/文件/下载链接)",
+      "https://github.com/Comfy-Org/workflow_templates (官方工作流中的采样参数)"
+    ],
+    "note": "所有 HF 下载链接格式为 https://huggingface.co/{repo}/resolve/main/{path} 。Civitai 链接需在末尾追加 &token=$CIVITAI_TOKEN 。models/ 目录相对 ComfyUI 根目录。",
+    "gpu_profiles": {
+      "T4": { "vram_gb": 16, "ram_gb": 32, "notes": "Turing 架构：无 bf16 / fp8 硬件加速（fp8/bf16 权重会在加载时被 ComfyUI 转为 fp16 计算，能跑但更慢）。不支持 nvfp4。推荐 int8_convrot / fp8 权重 + --lowvram 或 --reserve-vram 。" },
+      "A10": { "vram_gb": 24, "ram_gb": 110, "notes": "Ampere 架构：原生 bf16，fp8 权重可存储（计算走 bf16）。不支持 nvfp4。大多数模型可直接跑 bf16 / fp8_scaled。" }
+    }
+  },
+  "models": [
+    {
+      "id": "z_image_turbo",
+      "display": "Z-Image-Turbo (阿里通义 Tongyi-MAI, 6B DiT, 蒸馏版)",
+      "family": "flow-dit",
+      "prompt_style": "natural",
+      "supports_chinese_prompt": true,
+      "license": "Apache-2.0",
+      "homepage": "https://huggingface.co/Tongyi-MAI/Z-Image-Turbo",
+      "comfy_repo": "https://huggingface.co/Comfy-Org/z_image_turbo",
+      "official_workflow_template": "https://raw.githubusercontent.com/Comfy-Org/workflow_templates/main/templates/image_z_image_turbo.json",
+      "files": {
+        "diffusion_model": {
+          "A10": { "url": "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors", "size_gb": 12.31, "dest": "models/diffusion_models/z_image_turbo_bf16.safetensors" },
+          "T4": { "url": "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_int8_convrot.safetensors", "size_gb": 6.2, "dest": "models/diffusion_models/z_image_turbo_int8_convrot.safetensors" }
+        },
+        "text_encoder": {
+          "A10": { "url": "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors", "size_gb": 8.04, "dest": "models/text_encoders/qwen_3_4b.safetensors", "clip_loader_type": "lumina2" },
+          "T4": { "url": "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors", "size_gb": 5.63, "dest": "models/text_encoders/qwen_3_4b_fp8_mixed.safetensors", "clip_loader_type": "lumina2" }
+        },
+        "vae": { "url": "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors", "size_gb": 0.34, "dest": "models/vae/ae.safetensors", "note": "与 FLUX.1 的 ae.safetensors 相同文件（16 通道 VAE）" }
+      },
+      "sampling": {
+        "source": "Comfy-Org 官方模板 image_z_image_turbo.json",
+        "steps": 8, "cfg": 1.0, "sampler": "res_multistep", "scheduler": "simple",
+        "model_sampling": { "node": "ModelSamplingAuraFlow", "shift": 3 },
+        "negative": "无（ConditioningZeroOut）",
+        "latent_node": "EmptySD3LatentImage",
+        "resolution": "1024x1024 基准，支持 ~1MP 任意比例，最高 2048"
+      },
+      "prompt_tips": "自然语言长描述效果最好，中文/英文均可，中文文字渲染能力强。不要用 danbooru 标签堆砌。"
+    },
+    {
+      "id": "flux2_klein_4b",
+      "display": "FLUX.2 [klein] 4B (Black Forest Labs, 蒸馏版, Apache-2.0)",
+      "family": "flow-dit",
+      "prompt_style": "natural",
+      "supports_chinese_prompt": false,
+      "license": "Apache-2.0",
+      "homepage": "https://huggingface.co/black-forest-labs/FLUX.2-klein-4b",
+      "comfy_repo": "https://huggingface.co/Comfy-Org/flux2-klein",
+      "official_workflow_template": "https://raw.githubusercontent.com/Comfy-Org/workflow_templates/main/templates/image_flux2_klein_text_to_image.json",
+      "files": {
+        "diffusion_model": {
+          "all": { "url": "https://huggingface.co/Comfy-Org/flux2-klein/resolve/main/split_files/diffusion_models/flux-2-klein-4b.safetensors", "size_gb": 7.75, "dest": "models/diffusion_models/flux-2-klein-4b.safetensors" },
+          "base_variant_optional": { "url": "https://huggingface.co/Comfy-Org/flux2-klein/resolve/main/split_files/diffusion_models/flux-2-klein-base-4b.safetensors", "size_gb": 7.75, "dest": "models/diffusion_models/flux-2-klein-base-4b.safetensors", "note": "未蒸馏 Base 版：20 步 cfg 5，支持负面提示词，画质略好、慢 5 倍" }
+        },
+        "text_encoder": {
+          "all": { "url": "https://huggingface.co/Comfy-Org/flux2-klein/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors", "size_gb": 8.04, "dest": "models/text_encoders/qwen_3_4b.safetensors", "clip_loader_type": "flux2", "note": "与 Z-Image 的 qwen_3_4b.safetensors 是同一个文件，只需下载一次" }
+        },
+        "vae": { "url": "https://huggingface.co/Comfy-Org/flux2-klein/resolve/main/split_files/vae/flux2-vae.safetensors", "size_gb": 0.34, "dest": "models/vae/flux2-vae.safetensors" }
+      },
+      "sampling": {
+        "source": "Comfy-Org 官方模板 image_flux2_klein_text_to_image.json",
+        "distilled": { "steps": 4, "cfg": 1.0, "sampler": "euler", "scheduler_node": "Flux2Scheduler(steps, width, height)", "negative": "无（ConditioningZeroOut）" },
+        "base": { "steps": 20, "cfg": 5.0, "sampler": "euler", "scheduler_node": "Flux2Scheduler", "negative": "支持" },
+        "pipeline": "RandomNoise + KSamplerSelect + CFGGuider + Flux2Scheduler -> SamplerCustomAdvanced",
+        "latent_node": "EmptyFlux2LatentImage"
+      },
+      "prompt_tips": "自然语言，英文最佳。擅长写实、文字渲染一般。"
+    },
+    {
+      "id": "flux2_klein_9b",
+      "display": "FLUX.2 [klein] 9B (蒸馏版, 非商业许可)",
+      "family": "flow-dit",
+      "prompt_style": "natural",
+      "supports_chinese_prompt": false,
+      "license": "FLUX Non-Commercial License（HF 需登录同意，gated=auto）",
+      "homepage": "https://huggingface.co/black-forest-labs/FLUX.2-klein-9b",
+      "comfy_repo": "https://huggingface.co/Comfy-Org/flux2-klein-9b",
+      "files": {
+        "diffusion_model": {
+          "A10": { "url": "https://huggingface.co/black-forest-labs/FLUX.2-klein-9b/resolve/main/flux-2-klein-9b.safetensors", "size_gb": 18.16, "dest": "models/diffusion_models/flux-2-klein-9b.safetensors", "note": "需要 HF_TOKEN 且已在页面同意许可。A10 24G 建议 UNETLoader weight_dtype=fp8_e4m3fn（加载时转 fp8，显存减半）。T4 16G 不建议。" }
+        },
+        "text_encoder": {
+          "A10": { "url": "https://huggingface.co/Comfy-Org/flux2-klein-9b/resolve/main/split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors", "size_gb": 8.66, "dest": "models/text_encoders/qwen_3_8b_fp8mixed.safetensors", "clip_loader_type": "flux2" },
+          "full_bf16_optional": { "url": "https://huggingface.co/Comfy-Org/flux2-klein-9b/resolve/main/split_files/text_encoders/qwen_3_8b.safetensors", "size_gb": 16.38, "dest": "models/text_encoders/qwen_3_8b.safetensors" }
+        },
+        "vae": { "url": "https://huggingface.co/Comfy-Org/flux2-klein-9b/resolve/main/split_files/vae/flux2-vae.safetensors", "size_gb": 0.34, "dest": "models/vae/flux2-vae.safetensors", "note": "与 4B 共用" }
+      },
+      "sampling": { "same_as": "flux2_klein_4b", "steps": 4, "cfg": 1.0, "sampler": "euler" },
+      "gpu_recommendation": "仅 A10"
+    },
+    {
+      "id": "flux1_krea_dev",
+      "display": "FLUX.1 Krea [dev] (Krea × BFL, 12B, 写实美学调优)",
+      "family": "flow-dit",
+      "prompt_style": "natural",
+      "supports_chinese_prompt": false,
+      "license": "FLUX.1 [dev] Non-Commercial License",
+      "homepage": "https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev",
+      "comfy_repo": "https://huggingface.co/Comfy-Org/FLUX.1-Krea-dev_ComfyUI",
+      "official_workflow_template": "https://raw.githubusercontent.com/Comfy-Org/workflow_templates/main/templates/flux1_krea_dev.json",
+      "files": {
+        "diffusion_model": {
+          "all": { "url": "https://huggingface.co/Comfy-Org/FLUX.1-Krea-dev_ComfyUI/resolve/main/split_files/diffusion_models/flux1-krea-dev_fp8_scaled.safetensors", "size_gb": 11.9, "dest": "models/diffusion_models/flux1-krea-dev_fp8_scaled.safetensors" }
+        },
+        "text_encoder": {
+          "clip_l": { "url": "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors", "size_gb": 0.25, "dest": "models/text_encoders/clip_l.safetensors" },
+          "t5_A10": { "url": "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors", "size_gb": 9.79, "dest": "models/text_encoders/t5xxl_fp16.safetensors" },
+          "t5_T4": { "url": "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn_scaled.safetensors", "size_gb": 5.16, "dest": "models/text_encoders/t5xxl_fp8_e4m3fn_scaled.safetensors" },
+          "dual_clip_loader_type": "flux"
+        },
+        "vae": { "url": "https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged/resolve/main/split_files/vae/ae.safetensors", "size_gb": 0.34, "dest": "models/vae/ae.safetensors", "note": "与 Z-Image 共用，Comfy 官方模板也引用此链接" }
+      },
+      "sampling": {
+        "source": "Comfy-Org 官方模板 flux1_krea_dev.json + BFL 模型卡",
+        "steps": 20, "cfg": 1.0, "sampler": "euler", "scheduler": "simple",
+        "flux_guidance": 4.5,
+        "flux_guidance_note": "BFL 模型卡 guidance_scale=4.5；Comfy 模板未加 FluxGuidance 节点（默认 3.5）。本套件 3.5 / 4.5 都可，默认 3.5。",
+        "negative": "无（ConditioningZeroOut）",
+        "latent_node": "EmptySD3LatentImage"
+      },
+      "prompt_tips": "摄影式自然语言：镜头、光线、胶片质感描述效果极佳。去 AI 感是它的卖点。"
+    },
+    {
+      "id": "qwen_image_2_1",
+      "display": "Qwen-Image 2.1 (阿里 Qwen, 20B MMDiT, 原生 2K, 文字渲染最强)",
+      "family": "flow-dit",
+      "prompt_style": "natural",
+      "supports_chinese_prompt": true,
+      "license": "Qwen Research License",
+      "homepage": "https://huggingface.co/Qwen/Qwen-Image-2.1",
+      "comfy_repo": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1",
+      "official_workflow_template": "https://raw.githubusercontent.com/Comfy-Org/workflow_templates/main/templates/image_qwen_image_2_1_t2i.json",
+      "files": {
+        "diffusion_model": {
+          "base_int8": { "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/diffusion_models/qwen_image_2.1_int8_convrot.safetensors", "size_gb": 7.26, "dest": "models/diffusion_models/qwen_image_2.1_int8_convrot.safetensors" },
+          "turbo_int8": { "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/diffusion_models/qwen_image_2.1_turbo_int8_convrot.safetensors", "size_gb": 7.26, "dest": "models/diffusion_models/qwen_image_2.1_turbo_int8_convrot.safetensors", "note": "推荐先测 Turbo（8 步），时间省 3 倍" },
+          "base_bf16_A10_optional": { "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/diffusion_models/qwen_image_2.1_bf16.safetensors", "size_gb": 14.23, "dest": "models/diffusion_models/qwen_image_2.1_bf16.safetensors" }
+        },
+        "text_encoder": {
+          "A10": { "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/text_encoders/qwen3vl_8b_int8_convrot.safetensors", "size_gb": 9.35, "dest": "models/text_encoders/qwen3vl_8b_int8_convrot.safetensors", "clip_loader_type": "qwen_image" },
+          "T4": { "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/text_encoders/qwen3vl_8b_w4a8.safetensors", "size_gb": 6.31, "dest": "models/text_encoders/qwen3vl_8b_w4a8.safetensors", "clip_loader_type": "qwen_image", "note": "若 T4 跑 int8 TE 爆显存再换这个" }
+        },
+        "vae": { "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main/vae/qwen_image_2.1_vae_bf16.safetensors", "size_gb": 0.68, "dest": "models/vae/qwen_image_2.1_vae_bf16.safetensors", "note": "2.1 专用新 VAE，不能用老的 qwen_image_vae.safetensors" }
+      },
+      "sampling": {
+        "source": "Comfy-Org 官方模板 image_qwen_image_2_1_t2i.json / _turbo_t2i.json",
+        "base": { "steps": 25, "cfg": 1.0, "sampler": "euler", "scheduler": "simple" },
+        "turbo": { "steps": 8, "cfg": 1.0, "sampler": "euler", "scheduler": "simple" },
+        "latent_node": "EmptyLatentImage（ComfyUI 会自动修正潜空间通道数）",
+        "resolution": "原生支持 2048x2048；测评统一 1024 级别以便横向对比",
+        "requires": "ComfyUI 需为 2026-03 以后版本（支持 int8_convrot 量化格式与 qwen_image 2.1 架构）"
+      },
+      "prompt_tips": "中英文长描述，文字渲染（海报/招牌/多行文本）是强项。可选 Prompt Enhancer 模型（qwen3.5_9b_..._pe_t2i）本测评不启用以保证公平。"
+    },
+    {
+      "id": "sdxl_animagine_xl_4",
+      "display": "Animagine XL 4.0 (Cagliostro Lab, SDXL 二次元)",
+      "family": "sdxl",
+      "prompt_style": "tags",
+      "nsfw_capable": "部分",
+      "license": "CreativeML Open RAIL++-M",
+      "homepage": "https://huggingface.co/cagliostrolab/animagine-xl-4.0",
+      "files": {
+        "checkpoint": { "url": "https://huggingface.co/cagliostrolab/animagine-xl-4.0/resolve/main/animagine-xl-4.0-opt.safetensors", "size_gb": 6.94, "dest": "models/checkpoints/animagine-xl-4.0-opt.safetensors", "note": "opt 版为官方推荐（修正了部分色彩/构图问题）；内置 VAE，无需额外下载" }
+      },
+      "sampling": {
+        "source": "模型卡推荐",
+        "steps": 28, "cfg": 5.0, "sampler": "euler_ancestral", "scheduler": "normal",
+        "positive_prefix": "masterpiece, high score, great score, absurdres",
+        "negative": "lowres, bad anatomy, bad hands, text, error, missing finger, extra digits, fewer digits, cropped, worst quality, low quality, low score, bad score, average score, signature, watermark, username, blurry",
+        "prompt_format": "1girl/1boy, 角色名, 作品名, 标签..., 质量词。顺序敏感。"
+      }
+    },
+    {
+      "id": "sdxl_wai_illustrious",
+      "display": "WAI-illustrious-SDXL v17 (Illustrious 系最热门二次元合并模型)",
+      "family": "sdxl",
+      "prompt_style": "tags",
+      "nsfw_capable": true,
+      "homepage": "https://civitai.com/models/827184/wai-illustrious-sdxl",
+      "civitai_model_id": 827184,
+      "civitai_version_id": 2883731,
+      "files": {
+        "checkpoint": { "url": "https://civitai.com/api/download/models/2883731?type=Model&format=SafeTensor", "size_gb": 6.46, "dest": "models/checkpoints/waiIllustriousSDXL_v170.safetensors", "note": "需 CIVITAI_TOKEN；内置 VAE" }
+      },
+      "sampling": {
+        "source": "模型页推荐",
+        "steps": 28, "cfg": 6.0, "sampler": "euler_ancestral", "scheduler": "normal",
+        "positive_prefix": "masterpiece, best quality, amazing quality",
+        "negative": "bad quality, worst quality, worst detail, sketch, censor, lowres, bad anatomy, bad hands, watermark, signature"
+      }
+    },
+    {
+      "id": "sdxl_pornmaster_pro_v8",
+      "display": "PornMaster Pro SDXL V8 (写实 NSFW SDXL, 用户参考模型)",
+      "family": "sdxl",
+      "prompt_style": "natural_short",
+      "nsfw_capable": true,
+      "nsfw": true,
+      "homepage": "https://civitai.com/models/82543/pornmaster",
+      "homepage_mirror": "https://civitai.red/models/82543/pornmaster",
+      "civitai_model_id": 82543,
+      "civitai_version_id": 2551619,
+      "files": {
+        "checkpoint": { "url": "https://civitai.com/api/download/models/2551619?type=Model&format=SafeTensor", "size_gb": 6.62, "dest": "models/checkpoints/pornmaster_proSDXLV8.safetensors", "note": "需 CIVITAI_TOKEN 且账号开启 NSFW 显示；civitai.red 为镜像域名，API 域名仍为 civitai.com" }
+      },
+      "vae_optional": { "url": "https://huggingface.co/madebyollin/sdxl-vae-fp16-fix/resolve/main/sdxl_vae.safetensors", "size_gb": 0.33, "dest": "models/vae/sdxl_vae_fp16_fix.safetensors", "note": "若出现画面发灰/NaN 黑图可外挂此 VAE" },
+      "sampling": {
+        "source": "写实 SDXL 社区通用参数，模型页未给出唯一推荐——请 WorkBuddy 核对 Civitai 版本页说明后微调",
+        "steps": 30, "cfg": 5.0, "sampler": "dpmpp_2m", "scheduler": "karras",
+        "positive_prefix": "photorealistic, RAW photo, 8k uhd, detailed skin texture",
+        "negative": "cartoon, anime, 3d, painting, lowres, bad anatomy, bad hands, deformed, extra limbs, watermark, text, blurry, (child, kid, teen, young girl:1.5)"
+      },
+      "safety": "本套件 NSFW 类提示词全部限定成年人并写入年龄描述；负面提示词强制排除未成年特征。请遵守当地法律与平台规定。"
+    }
+  ],
+  "alternatives_not_included": [
+    { "name": "NoobAI-XL V-Pred 1.0", "url": "https://civitai.com/models/833294", "why_skipped": "v-prediction 模型需额外 ModelSamplingDiscrete(v_prediction, zsnr) 节点与特殊 CFG，和其他 SDXL 不同工作流，影响横向公平；可作为进阶项" },
+    { "name": "Pony Diffusion V6 XL", "url": "https://civitai.com/models/257749", "why_skipped": "需要 score_9 系列前缀，提示词体系不同；2024 老模型，已被 Illustrious 系超越" },
+    { "name": "Krea 2 (Comfy-Org/Krea-2, 2026-10 新发)", "url": "https://huggingface.co/Comfy-Org/Krea-2", "why_skipped": "fp8 版 13GB + Qwen3-VL-4B TE，T4 吃力；若只在 A10 测可加入：krea2_turbo_fp8_scaled + qwen3vl_4b_fp8_scaled(type krea2) + qwen_image_vae，8 步 cfg 1 euler simple" },
+    { "name": "FLUX.3 image klein", "url": "https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy", "why_skipped": "刚发布，CLIPLoader type flux3 + er_sde 15 步 cfg 3；需最新 ComfyUI，可作加测" }
+  ]
+}

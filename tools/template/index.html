@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<script>document.documentElement.classList.add("js")</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>开源文生图模型测评 · T2I Benchmark 2026</title>
+<meta name="description" content="13 个开源文生图模型配置，在 Tesla T4 16G 与 NVIDIA A10 24G 上跑同一套提示词，逐张记录 32 项参数。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="开源文生图模型测评 · T2I Benchmark 2026">
+<meta property="og:description" content="13 个配置 × 2 张卡，同一套提示词与记录协议。">
+<meta name="twitter:card" content="summary_large_image">
+<!--HEAD-EXTRA-->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23191612'/%3E%3Ctext x='16' y='21' font-family='monospace' font-size='11' font-weight='700' fill='%23f7f5f0' text-anchor='middle'%3ET2I%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body data-variant="__VARIANT__">
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <span class="mark">T2I</span>
+      <span>开源文生图测评</span>
+      <span class="sub">Benchmark 2026</span>
+    </a>
+    <nav class="nav">
+      <a href="index.html" aria-current="page">总览</a>
+      <a href="gallery.html">图库</a>
+      <a href="report.html">报告</a>
+      <a href="models.html">模型</a>
+      <a href="gpt.html">GPT 对照</a>
+      <a href="disclaimer.html">说明</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Benchmark · 2026-10-27 · T4 16G / A10 24G</div>
+          <h1>同一套题，<br>两张卡，<span class="hl">十三个配置</span>。</h1>
+          <p class="lede">
+            同一套提示词、六种画幅、统一记录协议。在 Tesla T4 与 NVIDIA A10 上逐张记录
+            <b>分辨率、步数、CFG、采样器、耗时与峰值显存</b>。空白图 0，记录与图片 1:1 对应。
+          </p>
+          <div class="cta-row">
+            <a class="btn" href="gallery.html">进图库 <span class="ar">→</span></a>
+            <a class="btn ghost" href="report.html">读测评报告</a>
+            <a class="btn ghost" href="gpt.html">GPT 画的那 30 张</a>
+          </div>
+        </div>
+
+        <aside class="plate">
+          <div class="plate-top"><b>Run sheet</b><span>2026 / 10 / 27</span></div>
+          <div class="rows">
+            <div class="row"><span class="k">有效图片</span><span class="v" data-fill="images">—<small>张</small></span></div>
+            <div class="row"><span class="k">模型配置</span><span class="v">13<small>T4 6 / A10 7</small></span></div>
+            <div class="row"><span class="k">总生成耗时</span><span class="v" data-fill="hours">—<small>小时</small></span></div>
+            <div class="row"><span class="k">T4 最快单张</span><span class="v" data-fill="fastT4">—<small>s</small></span></div>
+            <div class="row"><span class="k">T4 最慢单张</span><span class="v" data-fill="slowT4">—<small>s</small></span></div>
+            <div class="row"><span class="k">峰值显存</span><span class="v" data-fill="vram">—<small>/ 15.36 GB</small></span></div>
+          </div>
+          <div class="plate-foot">
+            全部记录来自 <b>records.jsonl</b>，每张 PNG 内嵌同一份 JSON 元数据。
+            <b>失败与异常记录已隔离</b>，不进入统计。
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+
+  <section class="sec" style="padding-top:0;border-top:0">
+    <div class="wrap"><div class="kpis reveal" id="kpis"></div></div>
+  </section>
+
+  <!-- 结论 -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="idx">01</span>
+        <h2>五条实测结论</h2>
+        <p class="note">
+          速度与显存是自动测量的；提示词遵循、美学、文字正确率需要人眼判定，这里只给结构性观察。
+        </p>
+      </div>
+      <div class="finds reveal" id="finds"></div>
+    </div>
+  </section>
+
+  <!-- 总耗时 -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="idx">02</span>
+        <h2>这些图一共跑了多久</h2>
+        <p class="note">
+          累计墙钟时间，不是估算。按模型拆开看，谁吃掉了大部分算力一目了然。
+        </p>
+      </div>
+      <div class="darkpanel reveal" id="timePanel"></div>
+    </div>
+  </section>
+
+  <!-- T4 -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="idx">03</span>
+        <h2>T4 · 16G 能跑什么</h2>
+        <p class="note">
+          按定版批次中位耗时排序。条形长度相对同卡最慢模型；右侧是峰值显存与累计耗时。
+        </p>
+      </div>
+      <div class="lb reveal" id="boardT4"></div>
+
+      <div class="two-col reveal" style="margin-top:30px">
+        <div class="note-box" style="margin:0">
+          <b>为什么有两个中位数。</b>
+          同一模型在 10-22 之前用旧启动参数（含 <span class="mono">--disable-smart-memory</span>），
+          之后换成定版参数。首页用「该模型最近一个批次」的中位；跨批次混合会把快模型算慢——
+          FLUX.2 klein 4B 全量中位 43.4 秒，定版批次只有 13.1 秒。两个数都列在模型页。计时批次会包含同批次里未公开展示的样本——耗时由画幅与步数决定，与画面内容无关。
+        </div>
+        <div class="note-box" style="margin:0">
+          <b>峰值显存按十进制 GB。</b>
+          T4 标称 16 GB（15360 MiB），三个大模型峰值 14901–14907 MB，只剩约 450 MB 余量。
+          此时 ComfyUI 必须把权重分块换入换出，PCIe 带宽成为隐性瓶颈。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- A10 -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="idx">04</span>
+        <h2>A10 · 24G 买到的是什么</h2>
+        <p class="note">
+          不是单纯的更快，而是「装得下」：Krea 2、Qwen 20B、MOSS 50 步在 16G 卡上根本起不来。
+        </p>
+      </div>
+      <div class="lb reveal" id="boardA10"></div>
+      <p style="margin:16px 0 0;font-size:12px;color:var(--ink-3)">
+        MOSS-Image 的 50 步基线与 8 步 DMD 加速档口径不同（是否启用 CFG、步数差 6 倍），分列统计、不混算。
+        <span class="mono">moss_image_base_fast</span> 使用 Base 权重 + DMD，与 SFT 版不是同一个底模。
+      </p>
+    </div>
+  </section>
+
+  <!-- 散点 -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="idx">05</span>
+        <h2>速度 × 显存，一眼看清边界</h2>
+        <p class="note">
+          横轴是中位耗时（对数），纵轴是峰值显存。右上角「又慢又吃显存」，左下角「又快又轻」。
+        </p>
+      </div>
+      <div class="scatter-wrap reveal">
+        <div id="scatter"></div>
+        <div class="scatter-legend" id="scatterLegend"></div>
+      </div>
+      <p style="margin:16px 0 0;font-size:12.5px;color:var(--ink-2);max-width:70ch">
+        虚线是 T4 的 15.36 GB 上限。T4 的三个大模型全部贴在线上——它们不是「跑得快」，
+        而是「刚好没掉下去」。A10 的点普遍偏左上，贵的不是速度，是那 8 GB 余量。
+      </p>
+    </div>
+  </section>
+
+  <!-- 类别 -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="idx">06</span>
+        <h2>题目分布</h2>
+        <p class="note">
+          14 个类别、51 条题。柱长为该类别实际出图张数（13 个配置各跑一次，部分题有双 seed）。
+        </p>
+      </div>
+      <div class="two-col reveal" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px">
+        <div class="catbar" id="catbar"></div>
+        <div>
+          <h3 style="font-size:15px;margin:0 0 10px">先看这八条</h3>
+          <p style="font-size:13px;color:var(--ink-2);line-height:1.85;margin:0 0 16px">
+            <b>P44 计数</b>（几个物体、什么颜色）· <b>P45 空间关系</b>（谁在谁左边）·
+            <b>P46 镜面反射</b>（镜中是否一致）· <b>P47 罕见材质</b>（反常识组合）——
+            这四条最能暴露模型是不是「只会画好看的图」。
+          </p>
+          <p style="font-size:13px;color:var(--ink-2);line-height:1.85;margin:0">
+            文字渲染看 <b>P23–P27</b>：英文招牌、中文书法、多行海报、双语菜单、手写 T 恤。
+            中文能力另看 Z-Image 的中文提示词批次。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 模型图鉴 -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="idx">07</span>
+        <h2>十三个配置，各自是什么</h2>
+        <p class="note">
+          厂商、架构、擅长什么，以及这一轮跑下来的代价——速度、显存、累计耗时。
+        </p>
+      </div>
+      <div class="mcards reveal" id="mcards"></div>
+      <p style="margin:18px 0 0;font-size:12px;color:var(--ink-3)">
+        去「模型」页看完整参数、权重文件与许可归类。
+      </p>
+    </div>
+  </section>
+
+  <!-- 复现 -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="idx">08</span>
+        <h2>怎么复现</h2>
+        <p class="note">
+          套件在 <span class="mono">kit/</span>，启动脚本在 <span class="mono">scripts/</span>，
+          偏离记录在 <span class="mono">docs/CHANGELOG.md</span>——十九条，全部留痕。
+        </p>
+      </div>
+
+      <div class="two-col reveal" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);align-items:start">
+        <div class="term">
+          <div class="term-top">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="path">/workspace</span>
+          </div>
+<pre><span class="c"># 1 装 ComfyUI（CPU 机可做）</span>
+<span class="p">$</span> <span class="cmd">bash kit/03_scripts/setup_comfyui.sh</span> <span class="flag">/workspace/ComfyUI</span>
+
+<span class="c"># 2 T4 用定版参数启动（关键：不要 --disable-smart-memory）</span>
+<span class="p">$</span> <span class="cmd">bash scripts/start_comfy_T4_fast.sh</span>
+
+<span class="c"># 3 按档位跑（支持断点续跑）</span>
+<span class="p">$</span> <span class="cmd">python3 kit/03_scripts/run_benchmark.py</span> <span class="flag">--profile T4 --tier standard --models all</span>
+
+<span class="c"># 4 汇总 + 画廊 + 打分表</span>
+<span class="p">$</span> <span class="cmd">python3 kit/03_scripts/make_report.py</span> <span class="flag">--out /workspace/bench_out</span>
+</pre>
+        </div>
+
+        <div>
+          <h3 style="font-size:15px;margin:0 0 10px">这套图的可信度来自</h3>
+          <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2);line-height:1.9">
+            <li><b>同一 prompt、同一 seed</b>，不为任何模型改写提示词</li>
+            <li><b>不加 LoRA</b>（MOSS 的 DMD 加速档单独标注）、不做后处理</li>
+            <li><b>官方推荐参数</b>，不逐模型调优</li>
+            <li><b>失败隔离</b>，不进统计也不删记录</li>
+            <li><b>19 条偏离记录</b>，包括 FLUX.3 在 T4 上全黑作废这种事故</li>
+          </ul>
+          <p style="margin:16px 0 0"><a class="btn ghost" href="docs/CHANGELOG.md">看 CHANGELOG <span class="ar">→</span></a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <p class="quote reveal">这不是排行榜。<br>是一份把条件写清楚、<span>让别人能重跑</span>的工程记录。</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h5>关于</h5>
+        <p>
+          13 个开源文生图配置在 T4 / A10 上的横向测评。所有图片由脚本生成，不做人工挑选；
+          参数随每张图写入 records.jsonl 与 PNG 元数据。
+        </p>
+      </div>
+      <div>
+        <h5>目录</h5>
+        <ul>
+          <li><a href="gallery.html">图库</a></li>
+          <li><a href="report.html">测评报告</a></li>
+          <li><a href="models.html">模型与权重</a></li>
+          <li><a href="disclaimer.html">范围与许可</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>原始数据</h5>
+        <ul>
+          <li><a href="data/summary.csv">summary.csv</a></li>
+          <li><a href="data/gallery.js">gallery.js</a></li>
+          <li><a href="docs/CHANGELOG.md">CHANGELOG.md</a></li>
+          <li><a href="kit/README.md">套件说明</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>T2I BENCHMARK · 2026-10-27 · 数据快照</span>
+      <span>代码 MIT · 数据与图片 CC BY-NC 4.0 · 不含模型权重</span>
+    </div>
+  </div>
+</footer>
+
+<script src="data/site-data.js"></script>
+<script src="assets/site.js"></script>
+<script>
+  (function () {
+    var d = window.BENCH;
+    if (!d) return;
+    var el = document.getElementById("tickerTrack");
+    if (!el) return;
+    var items = d.models.map(function (m) {
+      return "<span>" + m.name + "<i>" + m.median_final + "s</i></span>";
+    }).join("");
+    el.innerHTML = items + items;
+  })();
+</script>
+</body>
+</html>

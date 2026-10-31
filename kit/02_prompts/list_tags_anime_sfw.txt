@@ -1,0 +1,51 @@
+P01_portrait_studio_female	3:4	1girl, solo, freckles, curly hair, brown hair, portrait, looking at viewer, grey background, dramatic lighting, realistic, upper body
+P02_portrait_elderly_man	3:4	1boy, old man, solo, wrinkles, white hair, stubble, blue eyes, portrait, window light, indoors, realistic, close-up
+P03_portrait_group_three	4:3	3people, 2boys, 1girl, rooftop, sunset, yellow raincoat, skateboard, pink hair, bob cut, round eyewear, denim jacket, red hair, beard, green sweater, coffee cup, laughing, city skyline, realistic
+P04_portrait_child_ethnic	3:4	1girl, child, miao, traditional clothes, silver headdress, embroidery, indigo, smile, mountains, mist, outdoors, realistic, portrait
+P05_portrait_hands_closeup	4:3	hands, close-up, pottery, clay, pottery wheel, hands focus, dramatic lighting, dark background, realistic, detailed hands
+P06_landscape_alpine_dawn	16:9	no humans, scenery, mountain, lake, reflection, dawn, mist, trees, autumn, wide shot, landscape, realistic
+P07_landscape_desert_storm	21:9	no humans, scenery, desert, storm, lightning, clouds, sunset, rock formation, panorama, landscape, realistic
+P08_landscape_jiangnan_rain	3:4	1other, scenery, rain, canal, bridge, oil-paper umbrella, east asian architecture, lantern, reflection, wet, cobblestone, muted color
+P09_landscape_underwater	4:3	no humans, underwater, coral reef, fish, turtle, sunlight, caustics, colorful, scenery, realistic
+P10_cinematic_noir	21:9	1boy, detective, trench coat, fedora, monochrome, greyscale, film noir, venetian blinds, cigarette, smoke, dramatic shadow, indoors
+P11_cinematic_wesanderson	16:9	1boy, bellhop, purple uniform, hat box, symmetry, pastel colors, pink, hotel lobby, plant, wide shot, indoors
+P12_cinematic_action_rain	16:9	1girl, running, black jacket, leather jacket, wet, rain, night, neon lights, alley, city, motion blur, from below, cinematic lighting, puddle, reflection
+P13_cinematic_period_drama	16:9	multiple boys, multiple girls, 18th century, wig, aristocrat, banquet, candle, candlelight, chiaroscuro, indoors, dim lighting, historical
+P14_scifi_megacity	9:16	no humans, cyberpunk, city, night, skyscraper, hologram, neon lights, flying car, rain, from above, scenery, science fiction
+P15_scifi_spaceship_interior	16:9	1other, astronaut, spacesuit, orange suit, cockpit, spacecraft interior, zero gravity, floating, monitor, switch, earth, window, science fiction
+P16_scifi_robot_portrait	3:4	1other, android, robot, mechanical parts, transparent, cable, glowing, blue, heterochromia, camera eye, white background, portrait, science fiction
+P17_scifi_alien_planet	16:9	1other, scenery, alien planet, crystal, two suns, double shadow, bioluminescence, mushroom, spacesuit, science fiction, concept art
+P18_anime_girl_sakura	3:4	1girl, solo, long hair, silver hair, heterochromia, blue eyes, yellow eyes, school uniform, serafuku, navy blue, red ribbon, cherry blossoms, petals, wind, backlighting, looking at viewer, cowboy shot, outdoors, spring
+P19_anime_battle_dynamic	16:9	1boy, solo, swordsman, black coat, torn clothes, katana, glowing weapon, red, jumping, slashing, speed lines, debris, foreshortening, from below, storm, lightning, dynamic pose, action
+P20_anime_ghibli_slice	4:3	1girl, 1boy, old woman, child, apron, kitchen, cooking, stove, steam, onigiri, window, curtains, sunlight, summer, rural, ghibli style, watercolor, nostalgic, indoors
+P21_anime_mecha	9:16	mecha, robot, no humans, full body, hangar, white armor, blue armor, warning stripes, hydraulics, scaffolding, spotlight, rain, gundam, mechanical, highly detailed
+P22_anime_two_characters_interaction	4:3	2girls, yuri, train interior, sitting, sleeping, leaning on another, black hair, short hair, red scarf, blonde hair, twin braids, green eyes, blush, holding book, evening, window, sunlight, warm colors
+P23_text_cafe_sign	4:3	no humans, storefront, coffee shop, sign, english text, chalkboard, dusk, bicycle, warm lighting, realistic, scenery
+P24_text_chinese_calligraphy	3:4	no humans, calligraphy, chinese text, scroll, ink, seal, hanging scroll, grey wall, traditional
+P25_text_poster_multiline	9:16	no humans, poster, english text, jellyfish, glowing, blue, pink, black background, minimalist, graphic design
+P26_text_bilingual_menu	3:4	no humans, menu, chinese text, english text, table, chopsticks, tea, daylight, realistic
+P27_text_tshirt_handwriting	3:4	1boy, solo, white shirt, t-shirt, english text, clothes writing, outdoors, casual, upper body, realistic
+P28_art_oil_impressionist	4:3	1girl, parasol, white dress, field, flowers, poppy, red flowers, summer, wind, impressionism, oil painting, painterly, brush strokes, traditional media
+P29_art_ukiyoe	3:4	no humans, octopus, boat, waves, storm, ukiyo-e, woodblock print, traditional media, flat color, bold outlines, blue, japanese text, hokusai style
+P30_art_watercolor_botanical	3:4	no humans, flower, blue flower, poppy, botanical illustration, watercolor, traditional media, scientific illustration, cross-section, latin text, aged paper, vintage
+P31_art_lowpoly_isometric	1:1	no humans, isometric, low poly, 3d, floating island, lighthouse, house, pine tree, waterfall, clouds, pastel colors, white background, simple background
+P32_art_charcoal_sketch	3:4	no humans, horse, animal focus, profile, charcoal (medium), sketch, monochrome, greyscale, traditional media, toned paper, chalk, smudge
+P33_fantasy_dragon_library	16:9	1girl, elf, pointy ears, dragon, sleeping, library, bookshelf, ladder, book, candle, floating, stained glass, light rays, dust, fantasy, scenery, scale difference
+P34_fantasy_xianxia	9:16	1boy, solo, hanfu, white robe, wide sleeves, long hair, black hair, ribbon, flying sword, standing on sword, sea of clouds, sunrise, floating island, pagoda, crane (animal), mist, chinese clothes, xianxia, ink wash painting
+P35_fantasy_dark_ritual	16:9	5boys, multiple boys, hood, robe, cultist, circle, rune, glowing, green, cathedral, ruins, torch, moonlight, dark fantasy, painting, ominous, long shadows
+P36_arch_brutalist_exterior	4:3	1other, scenery, architecture, brutalism, concrete, building, museum, red door, overcast, minimalism, geometric, realistic
+P37_arch_interior_japandi	16:9	no humans, indoors, living room, interior, sofa, lamp, vase, plant, window, curtains, sunlight, wooden floor, minimalism, scenery, realistic
+P38_arch_forbidden_city_snow	16:9	multiple others, scenery, east asian architecture, forbidden city, snow, winter, palace, red walls, golden roof, symmetry, overcast, realistic
+P39_product_perfume	1:1	no humans, perfume bottle, glass, amber, gold, english text, marble, orange slice, rosemary, water drops, rim lighting, product photography, still life, realistic
+P40_food_ramen_overhead	1:1	no humans, food, ramen, noodles, bowl, egg, pork, nori, from above, steam, chopsticks, wooden table, food focus, realistic
+P41_product_sneaker_exploded	16:9	no humans, shoes, sneakers, exploded view, floating, white background, simple background, orange, product design, 3d, technical illustration
+P42_animal_wildlife_snowleopard	4:3	no humans, snow leopard, animal, animal focus, crouching, rock, snow, green eyes, looking at viewer, fluffy tail, mountains, blurry background, realistic
+P43_animal_anthro_cat_barista	3:4	no humans, cat, orange cat, animal focus, standing, apron, barista, coffee, latte art, cup, cafe, plant, warm lighting, realistic, funny
+P44_stress_counting_objects	1:1	no humans, still life, apple, pear, banana, mug, table, white background, simple background, food, realistic
+P45_stress_spatial_relations	4:3	no humans, cat, dog, fish, fishbowl, cardboard box, boots, red footwear, shelf, living room, indoors, daylight, realistic
+P46_stress_mirror_reflection	3:4	1girl, solo, green dress, earrings, pearl, mirror, reflection, from behind, vanity, perfume bottle, lamp, indoors, realistic
+P47_stress_unusual_material	4:3	no humans, bicycle, ice, transparent, blue, melting, beach, sand, sunlight, surreal, realistic
+P48_culture_spring_festival	16:9	multiple boys, multiple girls, family, chinese new year, dinner, round table, food, dumpling, fish, hot pot, paper cutting, lantern, red, indoors, smile, child, old man, old woman, realistic
+P49_culture_peking_opera	3:4	1boy, solo, peking opera, face paint, headdress, feathers, embroidery, dragon print, robe, long sleeves, stage, curtains, spotlight, chinese clothes, traditional
+P50_surreal_dali_telephone	4:3	no humans, surreal, telephone, desert, salt, cracked ground, birds, door, ocean, long shadows, oil painting, dali style, magritte style
+P51_surreal_micro_world	1:1	no humans, miniature, city, walnut, skyscraper, lights, fog, desk, pencil, macro, tilt-shift, surreal, highly detailed

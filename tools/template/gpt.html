@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<script>document.documentElement.classList.add("js")</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GPT 对照 · T2I Benchmark 2026</title>
+<meta name="description" content="同一套 51 条 SFW 提示词，ChatGPT 图像生成跑了其中 30 条。按提示词编号排成宫格，缺哪条一眼能看出来。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="GPT 对照 · T2I Benchmark 2026">
+<meta property="og:description" content="51 条提示词里 GPT 画了 30 条，空缺按编号留白。">
+<!--HEAD-EXTRA-->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23191612'/%3E%3Ctext x='16' y='21' font-family='monospace' font-size='11' font-weight='700' fill='%23f7f5f0' text-anchor='middle'%3ET2I%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* ---- GPT 对照页：宫格 + 灯箱，全部样式限定在 .gp- 前缀下 */
+  .gp-head { padding: 42px 0 0; }
+  .gp-head h1 { font-size: clamp(28px, 4.6vw, 52px); line-height: 1.12; margin: 10px 0 0; letter-spacing: -.02em; }
+  .gp-head h1 .thin { color: var(--ink-3); font-weight: 400; }
+  .gp-head p { max-width: 62ch; color: var(--ink-2); margin: 16px 0 0; }
+
+  .gp-stats { display: flex; flex-wrap: wrap; gap: 0; margin: 26px 0 0; border: 1px solid var(--line);
+              border-bottom: 1px solid var(--ink); background: var(--paper-2); }
+  .gp-stats div { flex: 1 1 130px; padding: 14px 16px; border-right: 1px solid var(--line); }
+  .gp-stats div:last-child { border-right: 0; }
+  .gp-stats b { display: block; font-family: var(--mono); font-size: 26px; font-weight: 600;
+                letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .gp-stats span { font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
+                   text-transform: uppercase; color: var(--ink-3); }
+  .gp-stats .hi b { color: var(--accent); }
+
+  .gp-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 30px 0 0;
+            padding: 12px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--line); }
+  .gp-bar .seg { display: inline-flex; border: 1px solid var(--line-2); }
+  .gp-bar .seg button { font: inherit; font-size: 12px; padding: 5px 12px; background: transparent;
+                        border: 0; border-right: 1px solid var(--line-2); color: var(--ink-2); cursor: pointer; }
+  .gp-bar .seg button:last-child { border-right: 0; }
+  .gp-bar .seg button.on { background: var(--ink); color: var(--paper); }
+  .gp-bar .hint { font-size: 11px; color: var(--ink-3); font-family: var(--mono); margin-left: auto; }
+
+  .gp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin: 24px 0 0; }
+  @media (max-width: 1100px) { .gp-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (max-width: 820px)  { .gp-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px)  { .gp-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+
+  .gp-cell { display: block; border: 1px solid var(--line); background: #fff; position: relative; }
+  .gp-cell .gp-frame { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--paper-2); }
+  .gp-cell img { width: 100%; height: 100%; object-fit: cover; display: block;
+                 transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+  .gp-cell:hover img { transform: scale(1.025); }
+  .gp-cell .gp-no { position: absolute; top: 0; left: 0; font-family: var(--mono); font-size: 10px;
+                 letter-spacing: .06em; background: var(--ink); color: var(--paper); padding: 2px 6px; }
+  .gp-cell .gp-cap { padding: 8px 9px 9px; border-top: 1px solid var(--line); }
+  .gp-cell .gp-cap b { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .06em;
+                    color: var(--accent); font-weight: 600; }
+  .gp-cell .gp-cap span { display: block; font-size: 11.5px; line-height: 1.45; color: var(--ink-2);
+                       margin-top: 2px; overflow: hidden; display: -webkit-box;
+                       -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+  .gp-cell.empty { border-style: dashed; border-color: var(--line-2); background: transparent; }
+  .gp-cell.empty .gp-frame { background: repeating-linear-gradient(135deg, #f2efe7 0 8px, #efece3 8px 16px); }
+  .gp-cell.empty .gp-frame i { position: absolute; inset: 0; display: grid; place-items: center;
+                            font-family: var(--mono); font-size: 11px; letter-spacing: .14em;
+                            color: #b3a893; font-style: normal; text-transform: uppercase; }
+  .gp-cell.empty .gp-cap b { color: var(--ink-3); }
+  .gp-cell.empty .gp-cap span { color: var(--ink-3); }
+
+
+  .gp-miss { margin: 46px 0 0; }
+  .gp-miss h2 { font-size: 20px; margin: 0 0 4px; letter-spacing: -.01em; }
+  .gp-miss .lead { font-size: 13px; color: var(--ink-3); margin: 0 0 16px; }
+  .gp-miss ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
+  .gp-miss li { display: grid; grid-template-columns: 52px minmax(0,1fr) 88px 54px; gap: 12px; align-items: baseline;
+                padding: 9px 2px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .gp-miss li b { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+  .gp-miss li span.c { font-size: 11px; color: var(--ink-3); font-family: var(--mono); text-align: left; }
+  .gp-miss li span.a { font-family: var(--mono); font-size: 11px; color: var(--ink-3); text-align: left; }
+  @media (max-width: 560px) { .gp-miss li { grid-template-columns: 44px 1fr auto; } .gp-miss li span.a { display: none; } }
+
+  .gp-foot { margin: 40px 0 60px; padding: 16px 0 0; border-top: 1px solid var(--line);
+             font-size: 12px; color: var(--ink-3); }
+
+  /* 灯箱 */
+  .gp-lb { position: fixed; inset: 0; z-index: 90; display: none; background: rgba(12,10,8,.93);
+           backdrop-filter: blur(3px); }
+  .gp-lb.on { display: grid; grid-template-rows: 1fr auto; }
+  .gp-lb .stage { display: grid; place-items: center; padding: 3vh 4vw 0; min-height: 0; }
+  .gp-lb img { max-width: 100%; max-height: 78vh; object-fit: contain; display: block;
+               box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .gp-lb .meta { padding: 14px 4vw 4vh; color: #cdc6b8; font-size: 13px; display: flex; flex-wrap: wrap;
+                 gap: 8px 18px; align-items: baseline; justify-content: center; }
+  .gp-lb .meta b { color: #f7f5f0; font-family: var(--mono); font-size: 12px; letter-spacing: .06em; }
+  .gp-lb .meta em { font-style: normal; font-family: var(--mono); font-size: 10.5px; color: #8a8172; }
+  .gp-lb .x { position: absolute; top: 14px; right: 18px; width: 36px; height: 36px; border: 1px solid #4a443b;
+              background: transparent; color: #e8e2d5; font-size: 18px; cursor: pointer; line-height: 1; }
+  .gp-lb .x:hover { background: var(--accent); border-color: var(--accent); }
+</style>
+</head>
+<body data-variant="__VARIANT__">
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <span class="mark">T2I</span>
+      <span>开源文生图测评</span>
+      <span class="sub">Benchmark 2026</span>
+    </a>
+    <nav class="nav">
+      <a href="index.html">总览</a>
+      <a href="gallery.html">图库</a>
+      <a href="report.html">报告</a>
+      <a href="models.html">模型</a>
+      <a href="gpt.html" aria-current="page">GPT 对照</a>
+      <a href="disclaimer.html">说明</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap gp-head">
+    <div class="eyebrow">Closed-source reference</div>
+    <h1>GPT 也画了这一组 <span class="thin">30 / 51</span></h1>
+    <p>
+      同一套 51 条 SFW 提示词，交给 ChatGPT 的图像生成跑了一遍，拿到 30 张。
+      这里按提示词编号排成宫格：有图的放图，没画的留一块斜纹空格，缺哪条一眼能看出来。
+      GPT 的图不在测评口径内——没有固定 seed、没有记录步数与显存，画幅也被拼图统一裁过，
+      只作「闭源模型长什么样」的参照，不与 13 个开源配置并列排名。
+    </p>
+    <div class="gp-stats">
+      <div><b id="sHave">30</b><span>已画</span></div>
+      <div class="hi"><b id="sMiss">21</b><span>未画</span></div>
+      <div><b id="sTotal">51</b><span>提示词总数</span></div>
+      <div><b id="sCats">14</b><span>覆盖类别</span></div>
+      <div><b id="sSheet">6</b><span>原始宫格</span></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="gp-bar">
+      <div class="seg" id="gpSeg">
+        <button data-m="all" class="on">全部格位</button>
+        <button data-m="have">只看已画</button>
+        <button data-m="miss">只看空缺</button>
+      </div>
+      <span class="hint">点击任意一张看大图 · Esc 关闭</span>
+    </div>
+    <div class="gp-grid" id="gpGrid"></div>
+
+    <section class="gp-miss">
+      <h2>还差的 21 条</h2>
+      <p class="lead">按编号排好，直接照着贴给 ChatGPT 就行。提示词原文在 <a href="models.html" style="border-bottom:1px solid var(--line-2)">模型页</a>与 <code class="mono" style="font-size:11.5px">kit/02_prompts/prompts_sfw.json</code> 里。</p>
+      <ol id="gpMiss"></ol>
+    </section>
+
+    <p class="gp-foot">
+      图片由 ChatGPT 图像生成产出，经 6 张宫格拼图逐格裁出，保留原图烘入的编号标签作为溯源；
+      仓库内为 760px 长边、q85 的 JPEG。宫格统一按 4:5 铺满裁切，点开看整张。<a href="gallery.html" style="border-bottom:1px solid var(--line-2)">图库</a>里是同一批提示词的实测输出。
+    </p>
+  </div>
+</main>
+
+<div class="gp-lb" id="gpLb" aria-hidden="true">
+  <button class="x" id="gpLbX" aria-label="关闭">×</button>
+  <div class="stage"><img id="gpLbImg" alt=""></div>
+  <div class="meta" id="gpLbMeta"></div>
+</div>
+
+<script src="data/site-data.js"></script>
+<script src="data/gpt.js"></script>
+<script>
+(function () {
+  var BENCH = window.BENCH || { prompts: [] };
+  var REF = window.GPTREF || { shots: [], missing: [] };
+  var byId = {};
+  REF.shots.forEach(function (s) { byId[s.p] = s; });
+  // 只用 SFW 提示词：两版都过滤成人向，保证格位一致
+  var prompts = (BENCH.prompts || []).filter(function (p) { return !p.nsfw; });
+
+  var grid = document.getElementById("gpGrid");
+  var missBox = document.getElementById("gpMiss");
+  var lb = document.getElementById("gpLb");
+  var lbImg = document.getElementById("gpLbImg");
+  var lbMeta = document.getElementById("gpLbMeta");
+
+  var CAT = {
+    portrait: "人像", landscape: "风景", cinematic: "电影", scifi: "科幻",
+    anime: "二次元", text: "文字渲染", art: "艺术风格", fantasy: "奇幻",
+    architecture: "建筑", product: "产品", animal: "动物", stress: "压力测试",
+    culture: "文化", surreal: "超现实"
+  };
+
+  function el(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+
+  var total = prompts.length || 51;
+  var have = REF.shots.length;
+  var miss = total - have;
+  document.getElementById("sHave").textContent = have;
+  document.getElementById("sMiss").textContent = miss;
+  document.getElementById("sTotal").textContent = total;
+  document.getElementById("sCats").textContent = new Set(REF.shots.map(function (s) { return s.cat; })).size;
+  document.getElementById("sSheet").textContent = new Set(REF.shots.map(function (s) { return s.sheet; })).size;
+
+  var order = [];
+  prompts.forEach(function (p, i) {
+    var s = byId[p.id];
+    var cell = el("div", "gp-cell" + (s ? "" : " empty"));
+    var no = String(i + 1).padStart(2, "0");
+    var frame = el("div", "gp-frame");
+    if (s) {
+      var img = el("img");
+      img.src = s.f;
+      img.alt = p.title;
+      img.loading = "lazy";
+      img.decoding = "async";
+      frame.appendChild(img);
+      frame.appendChild(el("span", "gp-no", no));
+      cell.appendChild(frame);
+      cell.appendChild(el("div", "gp-cap",
+        "<b>" + p.id.split("_")[0] + " · " + (CAT[p.category] || p.category) + "</b><span>" + p.title + "</span>"));
+      cell.style.cursor = "zoom-in";
+      cell.addEventListener("click", function () { open(s, p); });
+      order.push({ cell: cell, s: s });
+    } else {
+      frame.appendChild(el("i", null, "未画"));
+      frame.appendChild(el("span", "gp-no", no));
+      cell.appendChild(frame);
+      cell.appendChild(el("div", "gp-cap",
+        "<b>" + p.id.split("_")[0] + " · " + (CAT[p.category] || p.category) + "</b><span>" + p.title + "</span>"));
+    }
+    grid.appendChild(cell);
+  });
+
+  // 空缺清单
+  REF.missing.forEach(function (m) {
+    var li = el("li");
+    li.innerHTML = "<b>" + m.p.split("_")[0] + "</b>" +
+                   "<span>" + m.title + "</span>" +
+                   "<span class='c'>" + (CAT[m.cat] || m.cat) + "</span>" +
+                   "<span class='a'>" + m.aspect + "</span>";
+    missBox.appendChild(li);
+  });
+
+  // 三档过滤
+  var seg = document.getElementById("gpSeg");
+  seg.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    [].forEach.call(seg.querySelectorAll("button"), function (x) { x.classList.toggle("on", x === b); });
+    grid.classList.toggle("gp-only-empty", b.dataset.m === "miss");
+    if (b.dataset.m === "have") {
+      grid.classList.remove("gp-only-empty");
+      [].forEach.call(grid.children, function (c) { c.style.display = c.classList.contains("empty") ? "none" : ""; });
+    } else if (b.dataset.m === "miss") {
+      [].forEach.call(grid.children, function (c) { c.style.display = c.classList.contains("empty") ? "" : "none"; });
+    } else {
+      [].forEach.call(grid.children, function (c) { c.style.display = ""; });
+    }
+  });
+
+  function open(s, p) {
+    lbImg.src = s.f;
+    lbImg.alt = p.title;
+    lbMeta.innerHTML = "<b>" + p.id.split("_")[0] + " · " + (CAT[p.category] || p.category) + "</b>" +
+      "<span>" + p.title + "</span><em>GPT · " + s.w + "×" + s.h + " · 原画幅 " + s.aspect +
+      " · 第 " + s.no + " 格 / " + s.sheet + "</em>";
+    lb.classList.add("on");
+    lb.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+  function close() {
+    lb.classList.remove("on");
+    lb.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+  document.getElementById("gpLbX").addEventListener("click", close);
+  lb.addEventListener("click", function (e) { if (e.target === lb || e.target.classList.contains("stage")) close(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && lb.classList.contains("on")) close(); });
+})();
+</script>
+</body>
+</html>

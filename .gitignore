@@ -1,0 +1,16 @@
+# 原始产物：图片约 1.5 GB，默认不入库（仓库只带 520px 缩略图）
+bench_out/
+*.zip
+
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+
+# 日志
+*.log

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<script>document.documentElement.classList.add("js")</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>测评报告 · T2I Benchmark 2026</title>
+<meta name="description" content="13 个开源文生图配置在 T4 16G 与 A10 24G 上的速度、显存、架构家族差异、稳定性与选型结论。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="测评报告 · T2I Benchmark 2026">
+<meta property="og:description" content="速度、显存、架构差异、CLIP 崩溃与选型结论。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23191612'/%3E%3Ctext x='16' y='21' font-family='monospace' font-size='11' font-weight='700' fill='%23f7f5f0' text-anchor='middle'%3ET2I%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .rpt h2 { font-size: clamp(22px, 2.6vw, 30px); letter-spacing: -.02em; margin: 0 0 6px; }
+  .rpt .lead { color: var(--ink-3); font-size: 13px; margin: 0 0 22px; max-width: 66ch; }
+  .rpt section { padding: 34px 0 6px; border-top: 1px solid var(--line); }
+  .rpt section:first-of-type { border-top: 1px solid var(--ink); }
+  .rpt .secno {
+    font-family: var(--mono); font-size: 10px; color: var(--accent);
+    letter-spacing: .1em; display: block; margin-bottom: 8px;
+  }
+  .rpt p { max-width: 72ch; }
+  .rpt ul { max-width: 72ch; }
+</style>
+</head>
+<body data-variant="public">
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <span class="mark">T2I</span>
+      <span>开源文生图测评</span>
+      <span class="sub">Benchmark 2026</span>
+    </a>
+    <nav class="nav">
+      <a href="index.html">总览</a>
+      <a href="gallery.html">图库</a>
+      <a href="report.html" aria-current="page">报告</a>
+      <a href="models.html">模型</a>
+      <a href="gpt.html">GPT 对照</a>
+      <a href="disclaimer.html">说明</a>
+    </nav>
+  </div>
+</header>
+
+<main class="rpt">
+  <div class="wrap">
+    <div class="page-head">
+      <div class="eyebrow">05 — Report</div>
+      <h1>两张卡上的十三个配置</h1>
+      <p>
+        Tesla T4（16G）与 NVIDIA A10（24G）· 13 个开源模型配置 · 723 张有效图 ·
+        每张图 32 项参数完整留痕。本文回答三个工程问题：<b>16G 显存下哪些模型真的可用</b>、
+        <b>速度与显存的边界在哪</b>、<b>不同架构家族的差异在哪</b>。
+      </p>
+    </div>
+
+    <section class="reveal">
+      <span class="secno">01</span>
+      <h2>方法与口径</h2>
+      <p class="lead">所有模型用各自官方推荐参数，不统一改写、不加 LoRA、不开提示词增强。</p>
+      <div class="table-wrap">
+        <table class="spec">
+          <thead><tr><th>项</th><th>做法</th></tr></thead>
+          <tbody>
+            <tr><td>硬件</td><td>T4 16G（Turing，无 bf16 / fp8 原生加速）· A10 24G（Ampere，原生 bf16）</td></tr>
+            <tr><td>运行方式</td><td>ComfyUI + HTTP API 串行批处理；单模型连续跑完再切换，减少权重重载</td></tr>
+            <tr><td>T4 定版参数</td><td class="mono">--fp16-unet --lowvram --reserve-vram 0.5 --disable-cuda-malloc</td></tr>
+            <tr><td>计时</td><td>提交 prompt → 取回图片字节的墙钟时间，含文本编码与 VAE 解码；首张标记 cold_start</td></tr>
+            <tr><td>显存</td><td>独立线程每 0.5 秒采样 nvidia-smi memory.used，取峰值</td></tr>
+            <tr><td>记录</td><td>records.jsonl（32 字段）+ records.csv + PNG 内嵌 JSON，三层可追溯</td></tr>
+            <tr><td>容错</td><td>断点续跑以「记录 + 图片同时存在」判定；失败记录隔离，不进入统计</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note-box">
+        <b>两个中位数的区别。</b>「定版中位」取该模型最近一个运行批次，同批启动参数一致；
+        「全量中位」把历史上所有批次混在一起，会把早期用旧参数的慢速结果算进去。
+        跨版本比较请用定版中位，复核历史请用全量中位。
+      </div>
+    </section>
+
+    <section class="reveal">
+      <span class="secno">02</span>
+      <h2>数据集</h2>
+      <p class="lead"><span id="dsLead">51 条 SFW 提示词覆盖 14 个类别</span>，专门设计了几类难项：文字渲染、计数、空间关系、镜面反射、罕见材质。</p>
+      <div class="two-col">
+        <div class="table-wrap" style="border-top:1px solid var(--ink)">
+          <table class="spec">
+            <thead><tr><th>类别</th><th>条数</th><th>考察点</th></tr></thead>
+            <tbody>
+              <tr><td>人像 portrait</td><td class="mono">5</td><td>皮肤纹理、手部、多人关系、年龄与族群</td></tr>
+              <tr><td>风景 landscape</td><td class="mono">4</td><td>大气透视、光照一致性</td></tr>
+              <tr><td>电影 cinematic</td><td class="mono">4</td><td>镜头语言、调色、年代质感</td></tr>
+              <tr><td>科幻 scifi</td><td class="mono">4</td><td>结构合理性与设计密度</td></tr>
+              <tr><td>二次元 anime</td><td class="mono">5</td><td>风格一致性、角色互动</td></tr>
+              <tr><td>文字渲染 text</td><td class="mono">5</td><td>英文招牌、中文书法、多行排版、双语菜单、手写</td></tr>
+              <tr><td>艺术风格 art</td><td class="mono">5</td><td>笔触与流派还原</td></tr>
+              <tr><td>压力测试 stress</td><td class="mono">4</td><td>计数、空间关系、镜面反射、罕见材质</td></tr>
+              <tr><td>其余六类</td><td class="mono">15</td><td>奇幻、建筑、产品、动物、文化、超现实</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h3 style="font-size:15px;margin:0 0 10px">分档</h3>
+          <ul>
+            <li><b>standard</b>：51 条 SFW 全覆盖，主力档</li>
+            <li><b>zh</b>：中文提示词，仅 Z-Image 跑了 20 条</li>
+            <li><b>top20 / round2</b>：中途补测用的小批次</li>
+            <li><b>seed</b>：T4 六个模型跑 42 / 1234 双 seed，A10 新模型以 42 为主</li>
+          </ul>
+          <p style="font-size:12.5px;color:var(--ink-3);line-height:1.75;margin-top:14px" id="dsNote">
+            原 67 条中的 16 条成人向提示词与其 384 张生成图不在公开包内，相关统计已在生成站点时剔除。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal">
+      <span class="secno">03</span>
+      <h2>生成总耗时</h2>
+      <p class="lead">累计墙钟时间，按显卡与模型拆开。含首张的模型加载，所以比「中位 × 张数」略高。</p>
+      <div class="darkpanel" id="timePanel" style="margin:22px 0 8px"></div>
+      <p style="font-size:12.5px;color:var(--ink-3);max-width:74ch">
+        堆叠条按模型累计耗时排序，悬停看具体数值。时间线是每个运行批次的出图张数：
+        10-17 起步、10-18 T4 首轮、10-20 A10 阶段、10-22 换定版参数、10-27 补测。
+      </p>
+    </section>
+
+    <section class="reveal">
+      <span class="secno">04</span>
+      <h2>T4：16G 的真实边界</h2>
+      <p class="lead">六个配置全部跑满 51 条 SFW，无空白图、无缺图。</p>
+      <div class="table-wrap">
+        <table class="spec">
+          <thead><tr><th>模型</th><th>步数 / CFG</th><th>采样器</th><th>定版中位</th><th>全量中位</th><th>P90</th><th>累计</th><th>峰值显存</th><th>图数</th></tr></thead>
+          <tbody id="t4table"></tbody>
+        </table>
+      </div>
+      <h3 style="font-size:16px;margin:26px 0 8px">显存不是「够用」，是「刚好」</h3>
+      <p>
+        FLUX.2 klein 4B、Z-Image Turbo、FLUX.1 Krea 三个模型的峰值都在 14901–14907 MB，
+        而 T4 可用显存 15360 MB，只剩 400–500 MB。此时 ComfyUI 必须把权重分块换入换出，
+        <b>PCIe 带宽成为隐性瓶颈</b>——这是 Krea 单张 111 秒的主因，而不是算力不足。
+      </p>
+      <h3 style="font-size:16px;margin:26px 0 8px">一个启动参数带来 20–70% 提速</h3>
+      <p>
+        去掉 <span class="mono">--disable-smart-memory</span> 后，权重在同模型连续跑时常驻显存：
+        FLUX.2 klein 4B 从 43.4 秒降到 13.1 秒（3.3 倍），Z-Image 68.2 → 51.4 秒，WAI 27.2 → 28.1 秒（基本持平）。
+        对照实验显示 <span class="mono">--reserve-vram</span> 1.5 与 0.5、以及是否加
+        <span class="mono">--lowvram</span> 对速度没有影响（41.4 秒 vs 41.4 秒），
+        说明瓶颈在分块与算力，不在分配策略。
+      </p>
+    </section>
+
+    <section class="reveal">
+      <span class="secno">05</span>
+      <h2>A10：买到的是容量</h2>
+      <p class="lead">七个配置，包括 T4 根本起不来的 20B 级模型与 50 步基线。</p>
+      <div class="table-wrap">
+        <table class="spec">
+          <thead><tr><th>模型</th><th>步数 / CFG</th><th>采样器</th><th>定版中位</th><th>全量中位</th><th>P90</th><th>累计</th><th>峰值显存</th><th>图数</th></tr></thead>
+          <tbody id="a10table"></tbody>
+        </table>
+      </div>
+      <div class="note-box">
+        <b>MOSS 三个配置不要混算。</b>
+        50 步基线用真 CFG（cfg 3.0）、单张约 197 秒；两个 8 步 DMD 加速档无 CFG、约 18 秒。
+        加速档里 <span class="mono">moss_image_base_fast</span> 用的是 Base 权重，与 SFT 版不是同一个底模。
+      </div>
+    </section>
+
+    <section class="reveal">
+      <span class="secno">06</span>
+      <h2>架构家族的差异</h2>
+      <div class="table-wrap">
+        <table class="spec">
+          <thead><tr><th>家族</th><th>代表</th><th>步数</th><th>典型耗时</th><th>观察</th></tr></thead>
+          <tbody>
+            <tr><td>SDXL</td><td>Animagine / WAI / PornMaster</td><td class="mono">28–30</td><td class="mono">28–30s</td><td>显存最省（11–12G），生态最成熟；CLIP 有长度边界缺陷</td></tr>
+            <tr><td>FLUX.2 klein</td><td>flux2_klein_4b</td><td class="mono">4</td><td class="mono">13.1s</td><td>T4 最快；修复 smart-memory 后接近实时</td></tr>
+            <tr><td>FLUX.1 Krea</td><td>flux1_krea_dev</td><td class="mono">20</td><td class="mono">111.3s</td><td>12B 权重贴顶，T4 最慢</td></tr>
+            <tr><td>Z-Image</td><td>z_image_turbo</td><td class="mono">8</td><td class="mono">51.4s</td><td>8 步；T4 上支持中文编码</td></tr>
+            <tr><td>FLUX.3 klein</td><td>flux3_klein</td><td class="mono">16</td><td class="mono">13.0s</td><td>新代里最快；T4 上因数值溢出全黑，改 A10</td></tr>
+            <tr><td>Krea 2 Turbo</td><td>krea2_turbo</td><td class="mono">8</td><td class="mono">18.1s</td><td>峰值 18.8G，T4 无法承载</td></tr>
+            <tr><td>Qwen-Image 2.1</td><td>qwen_image_2_1 / turbo</td><td class="mono">25 / 8</td><td class="mono">66.2 / 24.1s</td><td>20B 级，只能上 A10；turbo 性价比最高</td></tr>
+            <tr><td>MOSS-Image</td><td>moss_image / _fast</td><td class="mono">50 / 8</td><td class="mono">196.7 / 18.1s</td><td>50 步 + 真 CFG 单张 3.3 分钟；8 步 DMD 后可用</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="reveal">
+      <span class="secno">07</span>
+      <h2>稳定性与已知崩溃</h2>
+      <div class="two-col">
+        <div>
+          <h3 style="font-size:15px;margin:0 0 8px">出图完整性</h3>
+          <ul>
+            <li>T4 有效图 <span id="figT4">366</span> 张，A10 <span id="figA10">357</span> 张，合计 <span id="figAll">723</span></li>
+            <li>空白图 0，缺图 0，记录与图片 1:1</li>
+            <li>失败记录隔离在 <span class="mono">records_failed_quarantine.jsonl</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="font-size:15px;margin:0 0 8px">两个真问题</h3>
+          <ul>
+            <li><b>SDXL CLIP 边界</b>：negative 超过 77 token（约 300 字符）必崩 <span class="mono">cublasSgemm</span>，
+              与语义无关；用「末尾逐段裁词重试」规避，年龄护栏词在开头不受影响。</li>
+            <li><b>FLUX.3 在 T4 全黑</b>：bf16 转 fp16 计算时数值溢出，产出纯黑图；
+              int8 权重在 Turing 上无原生算子。最终改为 A10 原生 bf16 重跑。</li>
+          </ul>
+        </div>
+      </div>
+      <p style="font-size:12.5px;color:var(--ink-3);margin-top:20px;max-width:78ch">
+        完整事故链与修复过程见 <a href="docs/CHANGELOG.md" style="border-bottom:1px solid var(--line-2)">docs/CHANGELOG.md</a>，
+        共 19 条偏离记录，包括一次 CUBLAS 错误污染 CUDA context 导致后续 61 条连锁失败。
+      </p>
+    </section>
+
+    <section class="reveal">
+      <span class="secno">08</span>
+      <h2>能力观察（需结合人工打分）</h2>
+      <p class="lead">速度与显存可以自动测量；提示词遵循、美学、文字正确率必须人眼判定。</p>
+      <div class="table-wrap">
+        <table class="spec">
+          <thead><tr><th>维度</th><th>怎么看</th><th>可比范围</th></tr></thead>
+          <tbody>
+            <tr><td>提示词遵循</td><td>stress 四条是否全部命中（数量、空间、镜面、材质）</td><td>全模型同题</td></tr>
+            <tr><td>文字渲染</td><td>text 五条：英文招牌 / 中文书法 / 多行海报 / 双语菜单 / 手写</td><td>全模型同题</td></tr>
+            <tr><td>人像与手部</td><td>portrait 五条，含手部特写、多人、儿童</td><td>全模型同题</td></tr>
+            <tr><td>风格还原</td><td>art 五条：油画 / 浮世绘 / 水彩 / 低多边形 / 炭笔</td><td>全模型同题</td></tr>
+            <tr><td>中文语义</td><td>zh 批次，仅 Z-Image 20 条样本</td><td>仅中文模型</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:18px">
+        量化打分请用随仓库提供的 <span class="mono">data/scores_template.csv</span>（若存在）或
+        <span class="mono">kit/03_scripts/make_report.py</span> 生成的同类模板，六个维度各 0–5 分。
+      </p>
+    </section>
+
+    <section class="reveal">
+      <span class="secno">09</span>
+      <h2>结论</h2>
+      <div class="finds" style="grid-template-columns:repeat(2,1fr)">
+        <div class="find">
+          <span class="no">T4 通用首选</span>
+          <h3>FLUX.2 klein 4B</h3>
+          <p>4 步、定版中位 13.1 秒、显存可承载。代价是贴顶，必须 lowvram。</p>
+        </div>
+        <div class="find">
+          <span class="no">中文与文字渲染</span>
+          <h3>Z-Image Turbo / Qwen-Image 2.1 Turbo</h3>
+          <p>T4 用 Z-Image（8 步 51.4 秒）；有 24G 卡就用 Qwen Turbo（8 步 24.1 秒），中文排版更稳。</p>
+        </div>
+        <div class="find">
+          <span class="no">极致速度</span>
+          <h3>FLUX.3 klein（A10）/ FLUX.2 klein（T4）</h3>
+          <p>A10 上 16 步 13.0 秒；T4 上 4 步 13.1 秒。两者在各自卡上都是最快。</p>
+        </div>
+        <div class="find">
+          <span class="no">布局可控</span>
+          <h3>MOSS-Image</h3>
+          <p>50 步单张约 197 秒，只适合小批量出图；做版面实验可以，不适合批量生产。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal">
+      <span class="secno">10</span>
+      <h2>复现</h2>
+      <div class="table-wrap">
+        <table class="spec">
+          <thead><tr><th>步骤</th><th>命令</th></tr></thead>
+          <tbody>
+            <tr><td>T4 启动</td><td class="mono">bash scripts/start_comfy_T4_fast.sh</td></tr>
+            <tr><td>SFW 全量</td><td class="mono">python3 kit/03_scripts/run_benchmark.py --profile T4 --tier standard --models all</td></tr>
+            <tr><td>CLIP 崩溃规避</td><td class="mono">--clip-retry</td></tr>
+            <tr><td>出汇总</td><td class="mono">python3 kit/03_scripts/make_report.py --out /workspace/bench_out</td></tr>
+            <tr><td>重建本站</td><td class="mono">python3 tools/build_site.py --src &lt;解压后的包&gt;</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:16px;font-size:12.5px;color:var(--ink-3)">
+        所有图片内嵌 PNG tEXt 元数据（benchmark + prompt），可用 exiftool 或 PIL 读取。
+      </p>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-bottom">
+      <span>T2I BENCHMARK · 2026-10-27 · 数据快照</span>
+      <span>代码 MIT · 数据与图片 CC BY-NC 4.0 · 不含模型权重</span>
+    </div>
+  </div>
+</footer>
+
+<script src="data/site-data.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>
