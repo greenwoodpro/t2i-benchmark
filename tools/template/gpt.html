@@ -66,6 +66,12 @@
   .gp-cell.empty .gp-cap span { color: var(--ink-3); }
 
 
+  .gp-empty-note { grid-column: 1 / -1; border: 1px dashed var(--line-2); background: var(--paper-2);
+                    padding: 26px 22px; font-size: 13px; color: var(--ink-2); line-height: 1.9; }
+  .gp-empty-note b { color: var(--accent); }
+  .gp-empty-note code { font-family: var(--mono); font-size: 12px; background: #fff;
+                        border: 1px solid var(--line); padding: 1px 5px; }
+
   .gp-miss { margin: 46px 0 0; }
   .gp-miss h2 { font-size: 20px; margin: 0 0 4px; letter-spacing: -.01em; }
   .gp-miss .lead { font-size: 13px; color: var(--ink-3); margin: 0 0 16px; }
@@ -204,6 +210,19 @@
   document.getElementById("sTotal").textContent = total;
   document.getElementById("sCats").textContent = new Set(REF.shots.map(function (s) { return s.cat; })).size;
   document.getElementById("sSheet").textContent = new Set(REF.shots.map(function (s) { return s.sheet; })).size;
+
+  if (!prompts.length) {
+    ["sHave", "sMiss", "sTotal", "sCats", "sSheet"].forEach(function (id) {
+      var e = document.getElementById(id); if (e) e.textContent = "—";
+    });
+    var ms = document.querySelector(".gp-miss"); if (ms) ms.style.display = "none";
+    grid.innerHTML = '<div class="gp-empty-note"><b>没读到提示词数据。</b><br>' +
+      '你打开的应该是构建母版（<code>t2i-site-src/template/gpt.html</code> 或 ' +
+      '<code>tools/template/gpt.html</code>），它旁边没有 <code>data/</code> 目录。' +
+      '请打开仓库根目录那份 <code>gpt.html</code>，或线上版 ' +
+      '<a href="https://greenwoodpro.github.io/t2i-benchmark/gpt.html" style="border-bottom:1px solid var(--line-2)">greenwoodpro.github.io/t2i-benchmark/gpt.html</a>。</div>';
+    return;
+  }
 
   var order = [];
   prompts.forEach(function (p, i) {
